@@ -1,15 +1,18 @@
 import requests
 import urllib.parse
+import configparser
 import bs4
 import re
 import os
 
 auth_data = {
-    "login": 'xxx',
-    "password": 'xxx',
-    "url": 'https://sdo.xxx.ru',
-    "url_course": 'https://sdo.xxx.ru/course/view.php?id=xxx'
+    'login': 'xxx',
+    'password': 'xxx',
+    'url': 'https://sdo.xxx.ru',
+    'url_course': 'https://sdo.xxx.ru/course/view.php?id=xxx'
 }
+
+work_dir = ''
 
 results_table = []
 
@@ -82,11 +85,12 @@ def table_save(f_name: str, ):
     return
 
 def file_save(links: list, f_name: str, s: requests.Session()):
+    global work_dir
     for link in links:
         cl_name = filename_clear(link)
-        cl_dir = 'files\\' + module_id_get(link)
+        cl_dir = work_dir + '\\' + module_id_get(link)
         file_name =  cl_dir + '\\' + f_name + '_' + cl_name
-        print('   [>' + file_name)
+        print('   [> ' + file_name)
         if not os.path.isdir(cl_dir):
             os.mkdir(cl_dir)
         with open(file_name, "wb") as file:
@@ -95,7 +99,21 @@ def file_save(links: list, f_name: str, s: requests.Session()):
         file.close()
     return s
 
+def config_read(path):
+    global auth_data
+    global work_dir
+    config = configparser.ConfigParser()
+    config.read(path)
+
+    d_login = config.get("Settings", "login")
+    d_password = config.get("Settings", "password")
+    d_url = config.get("Settings", "url")
+    d_url_course = config.get("Settings", "url_course")
+    work_dir = config.get("Settings", "work_dir")
+    auth_data.update ({'login': d_login,'password': d_password,'url': d_url, 'url_course': d_url_course})
+
 if __name__ == "__main__":
+    config_read('config.ini')
     ses = moodle_auth( data=auth_data )
     print(ses)
     course_links = moodle_getassign(auth_data,ses)
