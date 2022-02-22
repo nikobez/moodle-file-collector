@@ -1,7 +1,6 @@
 import requests
 import urllib.parse
 import configparser
-import hashlib
 import bs4
 import re
 import os
@@ -97,10 +96,6 @@ def file_save(links: list, f_name: str, s: requests.Session()):
         with open(file_name, "wb") as file:
             response_bin = s.get(link)
             file.write(response_bin.content)
-        file.close()
-        with open(file_name + '.md5', "w") as file:
-            md5 = hashlib.md5(response_bin.content)
-            file.write(md5.hexdigest())
         file.close()
     return s
 
