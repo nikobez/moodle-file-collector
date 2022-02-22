@@ -7,14 +7,13 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from io import StringIO
 
-def config_read(path):
+def config_read(path: str):
     config = configparser.ConfigParser()
     config.read(path)
     wdir = config.get("Settings", "work_dir")
     return wdir
 
 def do_md5(fname: str):
-
     with open(fname, "rb") as file:
         md5 = hashlib.md5(file.read())
     file.close()
@@ -30,7 +29,7 @@ def do_txt(fname: str):
     retstr = StringIO()
     laparams = LAParams()
     device = TextConverter(rsrcmgr, retstr, laparams=laparams)
-
+    md5_list = []
     with open(fname, "rb") as file:
         interpreter = PDFPageInterpreter(rsrcmgr, device)
         password = ""
@@ -48,6 +47,7 @@ def do_txt(fname: str):
     with open(fname + '.txt', "w", encoding="utf-8") as file:
         file.write(text)
     file.close()
+
     return
 
 def do_work(wdir: str):
@@ -64,6 +64,7 @@ def do_work(wdir: str):
                 if f_ext[1] == '.pdf':
                     do_txt(wdir + '\\' + sdir + '\\' + sfile)
                     do_md5(wdir + '\\' + sdir + '\\' + sfile)
+
     return
 
 if __name__ == "__main__":
